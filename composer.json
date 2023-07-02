@@ -1,0 +1,30 @@
+{
+  "name": "utxo-one/lightning-prism-php",
+  "description": "A payment splitter using lightning addresses",
+  "type": "library",
+  "require": {
+    "utxo-one/lnd-php": "^0.1.3",
+    "guzzlehttp/guzzle": "^7.7",
+    "vlucas/phpdotenv": "^5.5"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "LightningPrism\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "utxo.one",
+      "email": "github@utxo.one"
+    }
+  ],
+  "require-dev": {
+    "pestphp/pest": "^2.8"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
