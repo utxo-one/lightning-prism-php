@@ -21,7 +21,7 @@ $settings = [
 ];
 
 $lightningPrism = new LightningPrism(
-    settings: $prismSettings,
+    settings: $settings,
     amount: 2371,
     host: $this->host,
     port: $this->port,
