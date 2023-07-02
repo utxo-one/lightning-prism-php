@@ -1,2 +1,2 @@
 tests/Feature/.env
-vendor
+/vendor
