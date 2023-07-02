@@ -18,15 +18,12 @@ final class LightningPrismTest extends BaseTest
     public function testItCanZapPrism(): void
     {
         $settings = [
-            'utxo@testnet.nodeless.io' => 10,
+            'utxo@testnet.nodeless.io' => 60,
             'nostr@testnet.nodeless.io' => 40,
-            'testing@testnet.nodeless.io' => 50,
         ];
 
-        $prismSettings = new LightningPrismSettings($settings);
-
         $lightningPrism = new LightningPrism(
-            settings: $prismSettings,
+            settings: $settings,
             amount: 2371,
             host: $this->host,
             port: $this->port,

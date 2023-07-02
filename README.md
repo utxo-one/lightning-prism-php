@@ -20,8 +20,6 @@ $settings = [
     'testing@testnet.nodeless.io' => 50,
 ];
 
-$prismSettings = new LightningPrismSettings($settings);
-
 $lightningPrism = new LightningPrism(
     settings: $prismSettings,
     amount: 2371,

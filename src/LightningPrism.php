@@ -8,7 +8,7 @@ use UtxoOne\LndPhp\Services\LightningService;
 class LightningPrism
 {
     public function __construct(
-        private LightningPrismSettings $settings,
+        private $settings,
         private int $amount,
         private string $host,
         private string $port,
@@ -16,6 +16,7 @@ class LightningPrism
         private string $tlsCertificate,
         private bool $isTestnet = false,
     ) {
+        $this->settings = new LightningPrismSettings($settings);
     }
 
     public function zap(): array
