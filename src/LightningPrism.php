@@ -34,6 +34,10 @@ class LightningPrism
     {
         $paymentRequest = $this->lnurlCallback($lightningAddress, $satsAmount)->pr;
 
+        if ($this->getSatAmountFromInvoice($paymentRequest) !== $satsAmount) {
+            throw new \Exception('Amount in invoice does not match requested amount. expected: ' . $satsAmount . ' actual: ' . $this->getSatAmountFromInvoice($paymentRequest));
+        }
+
         try {
             return $this->sendLightningPayment($paymentRequest);
         } catch (\Exception $e) {
@@ -82,5 +86,59 @@ class LightningPrism
             paymentRequest: $paymentRequest,
             allowSelfPayment: true,
         );
+    }
+
+    private function getSatAmountFromInvoice(string $invoice): int
+    {
+        $hrp = $this->extractHrpFromInvoice($invoice);
+        return $this->hrpToSat($hrp, false);
+    }
+
+    private function extractHrpFromInvoice($invoice)
+    {
+        $pattern = '/(lnbc|lntb)(\d+[a-z])1/';
+        preg_match($pattern, $invoice, $matches);
+
+        if (!isset($matches[2])) {
+            throw new \Exception('Invalid invoice format. Unable to extract HRP.');
+        }
+
+        return $matches[2];
+    }
+
+    private function hrpToSat(string $hrpString, bool $outputString): int
+    {
+        $divisor = '';
+        $value = '';
+
+        if (preg_match('/^[munp]$/', substr($hrpString, -1))) {
+            $divisor = substr($hrpString, -1);
+            $value = substr($hrpString, 0, -1);
+        } elseif (preg_match('/^[^munp0-9]$/', substr($hrpString, -1))) {
+            throw new \Exception('Not a valid multiplier for the amount');
+        } else {
+            $value = $hrpString;
+        }
+
+        if (!preg_match('/^\d+$/', $value)) {
+            throw new \Exception('Not a valid human readable amount');
+        }
+
+        $valueBN = bcpow($value, '1');
+
+        $SATS_PER_BTC = '100000000';
+        $DIVISORS = ['m' => '1000', 'u' => '1000000', 'n' => '1000000000', 'p' => '1000000000000'];
+
+        $millisatoshisBN = $divisor
+            ? bcdiv(bcmul($valueBN, $SATS_PER_BTC), $DIVISORS[$divisor], 0)
+            : bcmul($valueBN, $SATS_PER_BTC);
+
+        $MAX_MILLISATS = '2100000000000000';
+
+        if (($divisor === 'p' && bcmod($valueBN, '10') != 0) || bccomp($millisatoshisBN, $MAX_MILLISATS) > 0) {
+            throw new \Exception('Amount is outside of valid range');
+        }
+
+        return $outputString ? $millisatoshisBN : (int)$millisatoshisBN;
     }
 }
