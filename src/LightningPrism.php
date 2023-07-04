@@ -24,7 +24,11 @@ class LightningPrism
         $responses = [];
         foreach($this->settings->getSettings() as $lightningAddress => $percentage) {
             $satsAmount = round($this->amount * ($percentage / 100));
-            $responses[$lightningAddress] = $this->payLightningAddress($satsAmount, $lightningAddress);
+            try {
+                $responses[$lightningAddress] = $this->payLightningAddress($satsAmount, $lightningAddress);
+            } catch (\Exception $e) {
+                $responses[$lightningAddress] = $e->getMessage();
+            }
         }
 
         return $responses;
